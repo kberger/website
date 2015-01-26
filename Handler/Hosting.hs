@@ -7,7 +7,7 @@ import Import
 
 getHostingR :: Handler Html
 getHostingR = do
-    filenames <- getFilenames
+    files <- getFiles
     defaultLayout $ do
         setTitle "File Processor"
         $(widgetFileNoReload def "hosting")

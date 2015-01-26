@@ -8,6 +8,7 @@ import Yesod.Auth.BrowserId (authBrowserId)
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
 import Data.Text            (Text)
+import Control.Concurrent.STM as STM
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -19,7 +20,7 @@ data App = App
     , appConnPool    :: ConnectionPool -- ^ Database connection pool.
     , appHttpManager :: Manager
     , appLogger      :: Logger
-    , filenames      :: [Text]
+    , files          :: (TVar [Text])
     }
 
 instance HasHttpManager App where
@@ -153,7 +154,12 @@ instance RenderMessage App FormMessage where
 -- https://github.com/yesodweb/yesod/wiki/i18n-messages-in-the-scaffolding
 
 -- Additional Accessors
-getFilenames :: Handler [Text]
-getFilenames = do
+getFiles :: Handler [Text]
+getFiles = do
     App {..} <- getYesod
-    return filenames
+    liftIO $ readTVarIO files
+
+addFile :: App -> Text -> Handler ()
+addFile (App {..}) op =
+    liftIO . STM.atomically $ do
+        modifyTVar files $ \ ops -> op : ops

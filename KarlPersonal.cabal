@@ -81,6 +81,7 @@ library
                  , containers
                  , vector
                  , time
+                 , stm
 
 executable         KarlPersonal
     if flag(library-only)

@@ -7,6 +7,7 @@ module Application
     ) where
 
 import Control.Monad.Logger                 (liftLoc, runLoggingT)
+import Control.Concurrent.STM as STM
 import Database.Persist.Sqlite              (createSqlitePool, runSqlPool,
                                              sqlDatabase, sqlPoolSize)
 import Import
@@ -46,6 +47,7 @@ makeFoundation appSettings = do
     appStatic <-
         (if appMutableStatic appSettings then staticDevel else static)
         (appStaticDir appSettings)
+    files <- STM.atomically $ newTVar ["file1.txt", "file2.pdf"]
 
     -- We need a log function to create a connection pool. We need a connection
     -- pool to create our foundation. And we need our foundation to get a
@@ -55,7 +57,6 @@ makeFoundation appSettings = do
     let mkFoundation appConnPool = App {..}
         tempFoundation = mkFoundation $ error "connPool forced in tempFoundation"
         logFunc = messageLoggerSource tempFoundation appLogger
-        filenames = ["readme.txt", "report.pdf", "music.wav"]
 
     -- Create the database connection pool
     pool <- flip runLoggingT logFunc $ createSqlitePool
