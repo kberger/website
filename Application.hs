@@ -26,6 +26,7 @@ import System.Log.FastLogger                (defaultBufSize, newStdoutLoggerSet,
 -- Don't forget to add new modules to your cabal file!
 import Handler.Common
 import Handler.Home
+import Handler.Hosting
 
 -- This line actually creates our YesodDispatch instance. It is the second half
 -- of the call to mkYesodData which occurs in Foundation.hs. Please see the
@@ -54,6 +55,7 @@ makeFoundation appSettings = do
     let mkFoundation appConnPool = App {..}
         tempFoundation = mkFoundation $ error "connPool forced in tempFoundation"
         logFunc = messageLoggerSource tempFoundation appLogger
+        filenames = ["readme.txt", "report.pdf", "music.wav"]
 
     -- Create the database connection pool
     pool <- flip runLoggingT logFunc $ createSqlitePool
