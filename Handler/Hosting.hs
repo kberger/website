@@ -1,5 +1,7 @@
 module Handler.Hosting where
 
+import Data.Conduit
+import Data.Conduit.Binary
 import Data.Default
 import Yesod
 import Yesod.Default.Util
@@ -19,7 +21,8 @@ postHostingR = do
     case result of
         FormSuccess fi -> do
             app <- getYesod
-            addFile app $ fileName fi
+            filebytes <- runResourceT $ fileSource fi $$ sinkLbs
+            addFile app (fileName fi, filebytes)
         _ -> return ()
     redirect HostingR
 
