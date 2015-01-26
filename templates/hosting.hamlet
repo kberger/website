@@ -5,3 +5,7 @@ $else
     <ul>
         $forall file <- files
             <li>#{file}
+<h2>Submit new file
+<form method=post action=@{HostingR} enctype=#{formEncType}>
+    ^{formWidget}
+        <input type="submit" value="Upload">

@@ -7,7 +7,6 @@ import Text.Jasmine         (minifym)
 import Yesod.Auth.BrowserId (authBrowserId)
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
-import Data.Text            (Text)
 import Control.Concurrent.STM as STM
 
 -- | The foundation datatype for your application. This can be a good place to
