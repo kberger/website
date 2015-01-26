@@ -1,12 +1,15 @@
 module Foundation where
 
 import Import.NoFoundation
-import Database.Persist.Sql (ConnectionPool, runSqlPool)
-import Text.Hamlet          (hamletFile)
-import Text.Jasmine         (minifym)
-import Yesod.Auth.BrowserId (authBrowserId)
-import Yesod.Default.Util   (addStaticContentExternal)
-import Yesod.Core.Types     (Logger)
+import Database.Persist.Sql           (ConnectionPool, runSqlPool)
+import Text.Hamlet                    (hamletFile)
+import Text.Jasmine                   (minifym)
+import Yesod.Auth.BrowserId           (authBrowserId)
+import Yesod.Default.Util             (addStaticContentExternal)
+import Yesod.Core.Types               (Logger)
+import qualified Data.ByteString.Lazy as LazyBS (ByteString)
+import qualified Control.Concurrent.STM as STM
+import qualified Data.Text as Text
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -18,6 +21,7 @@ data App = App
     , appConnPool    :: ConnectionPool -- ^ Database connection pool.
     , appHttpManager :: Manager
     , appLogger      :: Logger
+    , files          :: (TVar [(Text, LazyBS.ByteString)])
     }
 
 instance HasHttpManager App where
@@ -149,3 +153,23 @@ instance RenderMessage App FormMessage where
 -- https://github.com/yesodweb/yesod/wiki/Sending-email
 -- https://github.com/yesodweb/yesod/wiki/Serve-static-files-from-a-separate-domain
 -- https://github.com/yesodweb/yesod/wiki/i18n-messages-in-the-scaffolding
+
+-- Additional Accessors
+getFiles :: Handler [Text]
+getFiles = do
+    App {..} <- getYesod
+    state <- liftIO $ readTVarIO files
+    return $ map fst state
+
+addFile :: App -> (Text, LazyBS.ByteString) -> Handler ()
+addFile (App {..}) op =
+    liftIO . STM.atomically $ do
+        modifyTVar files $ \ ops -> op : ops
+
+getById :: Text -> Handler LazyBS.ByteString
+getById ident = do
+    App {..} <- getYesod
+    operations <- liftIO $ readTVarIO files
+    case lookup ident operations of
+        Nothing -> notFound
+        Just bytes -> return bytes

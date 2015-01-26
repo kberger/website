@@ -5,3 +5,5 @@
 /robots.txt RobotsR GET
 
 / HomeR GET POST
+/hosting HostingR GET POST
+/file/#Text PreviewR GET
