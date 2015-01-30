@@ -13,9 +13,9 @@ import Yesod.Default.Util
 
 import Import
 
-getPreviewR :: Text -> Handler Html
-getPreviewR file = do
-    bytes <- getById file
+getPreviewR :: Int -> Handler Html
+getPreviewR ident = do
+    StoredFile file bytes <- getById ident
     defaultLayout $ do
         setTitle . toMarkup $ "File Processor - " `Text.append` file
         previewBlock <- liftIO $ preview bytes

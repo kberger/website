@@ -11,6 +11,9 @@ import qualified Data.ByteString.Lazy as LazyBS (ByteString)
 import qualified Control.Concurrent.STM as STM
 import qualified Data.Text as Text
 
+data StoredFile = StoredFile !Text !LazyBS.ByteString
+type Store = [(Int, StoredFile)]
+
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
 -- starts running, such as database connections. Every handler will have
@@ -21,7 +24,8 @@ data App = App
     , appConnPool    :: ConnectionPool -- ^ Database connection pool.
     , appHttpManager :: Manager
     , appLogger      :: Logger
-    , files          :: (TVar [(Text, LazyBS.ByteString)])
+    , files          :: (TVar Store)
+    , nextId         :: (TVar Int)
     }
 
 instance HasHttpManager App where
@@ -155,21 +159,27 @@ instance RenderMessage App FormMessage where
 -- https://github.com/yesodweb/yesod/wiki/i18n-messages-in-the-scaffolding
 
 -- Additional Accessors
-getFiles :: Handler [Text]
+getNextId :: App -> STM Int
+getNextId (App {..}) = do
+    id <- readTVar nextId
+    writeTVar nextId $ id + 1
+    return id
+
+getFiles :: Handler [(Int, StoredFile)]
 getFiles = do
     App {..} <- getYesod
-    state <- liftIO $ readTVarIO files
-    return $ map fst state
+    liftIO $ readTVarIO files
 
-addFile :: App -> (Text, LazyBS.ByteString) -> Handler ()
-addFile (App {..}) op =
+addFile :: App -> StoredFile -> Handler ()
+addFile app@(App {..}) op =
     liftIO . STM.atomically $ do
-        modifyTVar files $ \ ops -> op : ops
+        ident <- getNextId app
+        modifyTVar files $ \ops -> (ident, op) : ops
 
-getById :: Text -> Handler LazyBS.ByteString
+getById :: Int -> Handler StoredFile
 getById ident = do
     App {..} <- getYesod
-    operations <- liftIO $ readTVarIO files
-    case lookup ident operations of
+    store <- liftIO $ readTVarIO files
+    case lookup ident store of
         Nothing -> notFound
-        Just bytes -> return bytes
+        Just file -> return file

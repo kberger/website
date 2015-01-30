@@ -22,7 +22,7 @@ postHostingR = do
         FormSuccess fi -> do
             app <- getYesod
             filebytes <- runResourceT $ fileSource fi $$ sinkLbs
-            addFile app (fileName fi, filebytes)
+            addFile app $ StoredFile (fileName fi) filebytes
         _ -> return ()
     redirect HostingR
 
