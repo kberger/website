@@ -1,0 +1,4 @@
+exec: ../dist/build/KarlPersonal/KarlPersonal
+host: "karlrberger.com"
+extra-hosts:
+  - "www.karlrberger.com"
