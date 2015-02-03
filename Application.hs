@@ -11,6 +11,7 @@ import qualified Control.Concurrent.STM as STM
 import Database.Persist.Sqlite              (createSqlitePool, runSqlPool,
                                              sqlDatabase, sqlPoolSize)
 import Import
+import Data.IntMap
 import Language.Haskell.TH.Syntax           (qLocation)
 import Network.Wai.Handler.Warp             (Settings, defaultSettings,
                                              defaultShouldDisplayException,
@@ -48,7 +49,7 @@ makeFoundation appSettings = do
     appStatic <-
         (if appMutableStatic appSettings then staticDevel else static)
         (appStaticDir appSettings)
-    files <- STM.atomically $ newTVar []
+    files <- STM.atomically $ newTVar empty
     nextId <- STM.atomically $ newTVar 1
 
     -- We need a log function to create a connection pool. We need a connection

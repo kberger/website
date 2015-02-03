@@ -10,9 +10,11 @@ import Yesod.Core.Types               (Logger)
 import qualified Data.ByteString.Lazy as LazyBS (ByteString)
 import qualified Control.Concurrent.STM as STM
 import qualified Data.Text as Text
+import Data.IntMap (IntMap)
+import qualified Data.IntMap as IntMap
 
 data StoredFile = StoredFile !Text !LazyBS.ByteString
-type Store = [(Int, StoredFile)]
+type Store = IntMap StoredFile
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -168,18 +170,19 @@ getNextId (App {..}) = do
 getFiles :: Handler [(Int, StoredFile)]
 getFiles = do
     App {..} <- getYesod
-    liftIO $ readTVarIO files
+    store <- liftIO $ readTVarIO files
+    return $ IntMap.toList store
 
 addFile :: App -> StoredFile -> Handler ()
 addFile app@(App {..}) op =
     liftIO . STM.atomically $ do
         ident <- getNextId app
-        modifyTVar files $ \ops -> (ident, op) : ops
+        modifyTVar files $ IntMap.insert ident op
 
 getById :: Int -> Handler StoredFile
 getById ident = do
     App {..} <- getYesod
     store <- liftIO $ readTVarIO files
-    case lookup ident store of
+    case IntMap.lookup ident store of
         Nothing -> notFound
         Just file -> return file
