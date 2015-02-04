@@ -4,6 +4,7 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
-/ HomeR GET POST
-/hosting HostingR GET POST
-/file/#Int PreviewR GET
+/                   HomeR     GET POST
+/hosting            HostingR  GET POST
+/file/#Int          PreviewR  GET
+/file/#Int/download DownloadR GET

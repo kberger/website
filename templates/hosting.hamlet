@@ -3,7 +3,7 @@ $if null files
     <p>No files have been uploaded yet.
 $else
     <ul>
-        $forall (ident, StoredFile file _) <- files
+        $forall (ident, StoredFile file _ _) <- files
             <li>
                 <a href=@{PreviewR ident}>#{file}
 <h2>Submit new file

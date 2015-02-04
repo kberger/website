@@ -23,6 +23,7 @@ library
                      Handler.Home
                      Handler.Hosting
                      Handler.Preview
+                     Handler.Download
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

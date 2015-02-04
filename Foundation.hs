@@ -13,7 +13,8 @@ import qualified Data.Text as Text
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as IntMap
 
-data StoredFile = StoredFile !Text !LazyBS.ByteString
+-- StoredFile is: Filename ContentType Content
+data StoredFile = StoredFile !Text !Text !LazyBS.ByteString
 type Store = IntMap StoredFile
 
 -- | The foundation datatype for your application. This can be a good place to

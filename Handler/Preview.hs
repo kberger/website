@@ -15,7 +15,7 @@ import Import
 
 getPreviewR :: Int -> Handler Html
 getPreviewR ident = do
-    StoredFile file bytes <- getById ident
+    StoredFile file _ bytes <- getById ident
     defaultLayout $ do
         setTitle . toMarkup $ "File Processor - " `Text.append` file
         previewBlock <- liftIO $ preview bytes
