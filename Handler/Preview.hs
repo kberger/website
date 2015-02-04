@@ -15,17 +15,20 @@ import Import
 
 getPreviewR :: Int -> Handler Html
 getPreviewR ident = do
-    StoredFile file _ bytes <- getById ident
+    StoredFile file contentType bytes <- getById ident
     defaultLayout $ do
         setTitle . toMarkup $ "File Processor - " `Text.append` file
-        previewBlock <- liftIO $ preview bytes
+        previewBlock <- liftIO $ preview ident contentType bytes
         $(widgetFileNoReload def "preview")
 
-preview :: LB.ByteString -> IO Widget
-preview bytes = do
-    eText <- Ex.try . Ex.evaluate $ LT.decodeUtf8 bytes :: IO (Either Ex.SomeException LT.Text)
-    return $ case eText of
-        Left _ -> errorMessage
-        Right text -> [whamlet|<pre>#{text}|]
+preview :: Int -> Text -> LB.ByteString -> IO Widget
+preview ident contentType bytes
+    | "image/" `Text.isPrefixOf` contentType = 
+        return [whamlet|<img src=@{DownloadR ident}>|]
+    | otherwise = do 
+        eText <- Ex.try . Ex.evaluate $ LT.decodeUtf8 bytes :: IO (Either Ex.SomeException LT.Text)
+        return $ case eText of
+            Left _ -> errorMessage
+            Right text -> [whamlet|<pre>#{text}|]
     where
         errorMessage = [whamlet|<pre>Unable to display file contents.|]
