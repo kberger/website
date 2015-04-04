@@ -81,7 +81,11 @@ instance Yesod App where
     isAuthorized (AuthR _) _ = return Authorized
     isAuthorized FaviconR _ = return Authorized
     isAuthorized RobotsR _ = return Authorized
-    -- Default to Authorized for now.
+    isAuthorized HomeR _ = return Authorized
+    -- Routes requiring authentication
+    isAuthorized HostingR _ = return AuthenticationRequired
+    isAuthorized (PreviewR _) _ = return AuthenticationRequired
+    -- Otherwise, permit
     isAuthorized _ _ = return Authorized
 
     -- This function creates static content files in the static folder
@@ -117,7 +121,8 @@ instance YesodPersist App where
     type YesodPersistBackend App = SqlBackend
     runDB action = do
         master <- getYesod
-        runSqlPool action $ appConnPool master
+        let pool = appConnPool master
+        runSqlPool action pool
 instance YesodPersistRunner App where
     getDBRunner = defaultGetDBRunner appConnPool
 
@@ -129,7 +134,7 @@ instance YesodAuth App where
     -- Where to send a user after logout
     logoutDest _ = HomeR
     -- Override the above two destinations when a Referer: header is present
-    redirectToReferer _ = True
+    --redirectToReferer _ = True
 
     getAuthId creds = runDB $ do
         x <- getBy $ UniqueUser $ credsIdent creds

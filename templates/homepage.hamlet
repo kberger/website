@@ -1,5 +1,12 @@
 <h1>Welcome to Yesod!
-
+<p>Your current auth ID: #{show maid}
+$maybe _ <- maid
+    <p>
+        <a href=@{AuthR LogoutR}>Logout
+$nothing
+    <p>
+        <a href=@{AuthR LoginR}>Got to the login page
+<a href=@{HostingR}>File Sharing</a>
 <ol>
   <li>Now that you have a working project you should use the #
     \<a href="http://www.yesodweb.com/book/">Yesod book<span class="glyphicon glyphicon-book"></span></a> to learn more. #

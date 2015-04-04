@@ -14,6 +14,7 @@ import Yesod.Form.Bootstrap3 (BootstrapFormLayout (..), renderBootstrap3,
 getHomeR :: Handler Html
 getHomeR = do
     (formWidget, formEnctype) <- generateFormPost sampleForm
+    maid <- maybeAuthId
     let submission = Nothing :: Maybe (FileInfo, Text)
         handlerName = "getHomeR" :: Text
     defaultLayout $ do
@@ -24,6 +25,7 @@ getHomeR = do
 postHomeR :: Handler Html
 postHomeR = do
     ((result, formWidget), formEnctype) <- runFormPost sampleForm
+    maid <- maybeAuthId
     let handlerName = "postHomeR" :: Text
         submission = case result of
             FormSuccess res -> Just res
