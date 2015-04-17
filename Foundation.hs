@@ -78,13 +78,13 @@ instance Yesod App where
     authRoute _ = Just $ AuthR LoginR
 
     -- Routes not requiring authentication.
-    isAuthorized (AuthR _) _ = return Authorized
-    isAuthorized FaviconR _ = return Authorized
-    isAuthorized RobotsR _ = return Authorized
-    isAuthorized HomeR _ = return Authorized
+    --isAuthorized (AuthR _) _ = return Authorized
+    --isAuthorized FaviconR _ = return Authorized
+    --isAuthorized RobotsR _ = return Authorized
+    --isAuthorized HomeR _ = return Authorized
     -- Routes requiring authentication
-    isAuthorized HostingR _ = return AuthenticationRequired
-    isAuthorized (PreviewR _) _ = return AuthenticationRequired
+    --isAuthorized HostingR _ = return AuthenticationRequired
+    --isAuthorized (PreviewR _) _ = return AuthenticationRequired
     -- Otherwise, permit
     isAuthorized _ _ = return Authorized
 
