@@ -2,13 +2,13 @@ from fabric.api import local,lcd,cd,put,sudo
 
 DEP_DIR='/opt/keter/incoming'
 
-def build_website():
+def build():
     local('stack exec -- yesod keter')
 
-def deploy_website():
+def deploy():
     with cd('/opt/keter'):
         put('KarlPersonal.keter','incoming')
 
-def deploy_KarlPersonal():
-    build_website()
-    deploy_website()
+def refresh_KarlPersonal():
+    build()
+    deploy()
