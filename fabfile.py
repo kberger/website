@@ -3,7 +3,7 @@ from fabric.api import local,lcd,cd,put,sudo
 DEP_DIR='/opt/keter/incoming'
 
 def build_website():
-    local('yesod keter')
+    local('stack exec -- yesod keter')
 
 def deploy_website():
     with cd('/opt/keter'):
